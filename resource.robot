@@ -15,7 +15,7 @@ ${INVALID_CHARS}           .:\/()[]{}
 
 Gerar Data Aleatória Menor Que Atual
     ${data_atual}=    Get Current Date    
-    ${intervalo_dias}=    Generate Random String    length=3     chars=[NUMBERS]   	       
+    ${intervalo_dias}=    Generate Random String    length=4     chars=[NUMBERS]   	       
     ${data_aleatoria}=    Subtract Time From Date    ${data_atual}    ${intervalo_dias} days    result_format=%d/%m/%Y %H:%M:%S
 
     Log    Data Atual: ${data_atual}
@@ -43,6 +43,7 @@ Fazer Requisicao POST Criação De Lote
     Create Session    alias=CriarLote    url=${url}   headers=${headers}
     ${body}=    Load Json From File    data/criacaoLote.json
     Update Value To Json   ${body}    idMovimento    ${IDMVDiario}
+    Update Value To Json   ${body}    dataGeracao    ${data_aleatoria}
     ${response}=    POST On Session  CriarLote    /${endpoint}  json=${body}     headers=${headers}
     [Return]    ${response}
 
@@ -89,3 +90,14 @@ Fazer Consulta GET Consulta de Movimento Diario Após Fechado
     [Return]    ${response}
   
     Sleep    7s
+
+Fazer Consulta GET Consulta de Lote após fechado
+    ${url}=    Set Variable    http://movimentodiarioapi.estaparqa.corp
+    ${endpoint}=  Set Variable  api/v1/MovimentoDiario/${IDMVDiario}/lote
+    ${headers}=    Create Dictionary    Accept=*
+    Create Session    alias=ConsultaLote    url=${url}   headers=${headers}
+    ${response}=    GET On Session  ConsultaLote    /${endpoint}      headers=${headers}
+    [Return]    ${response}
+
+    Sleep    4s
+    
